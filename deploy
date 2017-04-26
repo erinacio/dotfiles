@@ -1,0 +1,53 @@
+#!/bin/bash
+
+function ask_yesno {
+    read -p "$1 (Y/n)" answer
+    case ${answer:0:1} in
+        n|N )
+            return 1
+        ;;
+        * )
+            return 0
+        ;;
+    esac
+}
+
+if ! ask_yesno 'This script may overwrite any existent file. Continue?'; then
+    exit 1
+fi
+
+if ask_yesno 'Install zsh dotfiles?'; then
+    set -e
+    cp zsh/zshrc "$HOME/.zshrc"
+    cp -rT zsh/zsh-custom "$HOME/.zsh-custom"
+    cp zsh/custom.zsh "$HOME/.zsh-custom/custom.zsh"
+    echo "Please edit $HOME/.zsh-custom/custom.zsh to meet your requirements."
+    set +e
+fi
+
+if ask_yesno 'Install bash dotfiles?'; then
+    set -e
+    for i in rc _profile; do
+        cp bash/bash$i "$HOME/.bash$i"
+    done
+    set +e
+fi
+
+if ask_yesno 'Install vim dotfiles? This will install Vundle as well.'; then
+    set -e
+    echo 'Please ignore any error message related to color scheme.'
+    rm -rf "$HOME/.vim/bundle/Vundle.vim"
+    mkdir -p "$HOME/.vim/bundle"
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+    for i in vimrc vimrc-common vimrc-commonplugins vimrc-gui vimrc-ycm; do
+        cp vim/$i "$HOME/.$i"
+    done
+    cp -rT vim/vim-after "$HOME/.vim/after"
+    vim +PluginInstall +qall
+    set +e
+fi
+
+if ask_yesno 'Install tmux dotfiles?'; then
+    set -e
+    cp tmux/tmux.conf "$HOME/.tmux.conf"
+fi

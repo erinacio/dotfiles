@@ -1,0 +1,59 @@
+set nocompatible
+filetype off
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+so ~/.vimrc-commonplugins
+Plugin 'Valloric/YouCompleteMe'
+
+call vundle#end()
+
+filetype plugin indent on
+
+so ~/.vimrc-common
+if has('gui_running')
+    so ~/.vimrc-gui
+endif
+
+let g:ycm_min_num_of_chars_for_completion = 1
+let g:ycm_extra_conf_globlist = ['~/Projects/*']
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_python_binary_path = 'python'
+let g:ycm_server_python_interpreter = '/usr/bin/python3'
+let g:ycm_key_invoke_completion = '<C-Space>'
+let g:ycm_rust_src_path = '/usr/local/src/rustc/stable/src'
+
+nmap <F12>i :YcmCompleter GoToInclude<CR>
+nmap <F12>d :YcmCompleter GoToDeclaration<CR>
+nmap <F12>D :YcmCompleter GoToDefinition<CR>
+nmap <F12>g :YcmCompleter GoTo<CR>
+nmap <F12>G :YcmCompleter GoToImprecise<CR>
+nmap <F12>r :YcmCompleter GoToReferences<CR>
+nmap <F12>I :YcmCompleter GoToImplementation<CR>
+nmap <F12>t :YcmCompleter GetType<CR>
+nmap <F12>p :YcmCompleter GetParent<CR>
+nmap <F12>= :YcmCompleter GetDoc<CR>
+nmap <F12>f :YcmCompleter FixIt<CR>
+nmap <F12>R :YcmCompleter RefactorRename
+nmap <F12><F12> :YcmForceCompileAndDiagnostics<CR>
+
+function PrintYcmCompleterKeyBindings()
+    echo '==== YCM <F12> Key Bindings ===='
+    echo 'i: GoToInclude'
+    echo 'd: GoToDeclaration'
+    echo 'D: GoToDefinition'
+    echo 'g: GoTo'
+    echo 'G: GoToImprecise'
+    echo 'r: GoToReferences'
+    echo 'I: GoToImplementation'
+    echo 't: GetType'
+    echo 'p: GetParent'
+    echo '=: GetDoc'
+    echo 'f: FixIt'
+    echo 'R: RefactorRename'
+endfunction
+
+nmap <F12>h :call PrintYcmCompleterKeyBindings()<CR>
+nmap <F12>? :call PrintYcmCompleterKeyBindings()<CR>

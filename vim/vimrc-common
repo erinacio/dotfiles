@@ -1,0 +1,96 @@
+" Commom configuration
+set nocompatible
+filetype plugin indent on
+set ruler
+set hlsearch
+syntax enable
+syntax on
+set background=dark
+colorscheme monokai
+set backspace=indent,eol,start
+set encoding=utf-8
+set fileencodings=utf-8
+set ffs=unix
+set ambiwidth=double
+set linebreak
+set fo+=mB
+set number
+set shiftwidth=4
+set tabstop=4
+set expandtab
+set softtabstop=4
+set autoindent
+set ssop-=options
+set ssop-=folds
+set cinoptions=N-s:0l1 " no indent in namespace
+
+set mouse=a
+set clipboard=unnamedplus
+set t_Co=256
+
+set colorcolumn=80,92,120,150
+
+set foldmethod=marker
+
+highlight Pmenu ctermbg=darkgray ctermfg=white
+highlight PmenuSel ctermbg=grey ctermfg=black
+
+command W w !sudo tee % > /dev/null
+
+nmap <TAB> :bnext<CR>
+nmap <S-TAB> :bprev<CR>
+
+nmap <C-Down> :bnext<CR>
+nmap <C-Up> :bprev<CR>
+nmap <C-Left> gT
+nmap <C-Right> gt
+nmap <S-Left> :tabm -<CR>
+nmap <S-Right> :tabm +<CR>
+imap <C-Down> <ESC>:bnext<CR>a
+imap <C-Up> <ESC>:bprev<CR>a
+imap <C-Left> <ESC>gTa
+imap <C-Right> <ESC>gta
+imap <S-Left> <ESC>:tabm -<CR>a
+imap <S-Right> <ESC>:tabm +<CR>a
+
+nmap <C-S> <ESC>:w<CR>
+imap <C-S> <ESC>:w<CR>a
+imap <C-V> <ESC>pa
+
+nmap <F2> :NERDTreeTabsToggle<CR>
+nmap <F3> :wall<CR>:mksession!<CR>:qall<CR>
+nmap <F4> :qall<CR>
+nmap <F5> :call ExecuteCurrentFile()<CR>
+nmap <F6> :shell<CR>
+
+nmap ,s :%s/\s\+$<CR>
+nmap ,f gg=G
+
+function ExecuteCurrentFile()
+    write
+    if &filetype == 'python'
+        ! python %
+    elseif &filetype == 'perl'
+        ! perl %
+    elseif &filetype == 'c'
+        ! gcc % -o /tmp/a.out && /tmp/a.out
+    elseif &filetype == 'cpp'
+        ! g++ % -o /tmp/a.out && /tmp/a.out
+    end
+endfunction
+
+function PrintCustomCommonKeyBindings()
+    echo '==== VIM Custom Common Key Bindings ==='
+    echo '<F2>           toggle nerd tree'
+    echo '<F3>           quick quit and preserve session'
+    echo '<F4>           quit all'
+    echo '<F5>           make'
+    echo '<F6>           shell'
+    echo '<C-left/right> change tab'
+    echo '<S-left/right> move tab'
+    echo '<C-up/down>    change buffer'
+    echo ',s             remove trailing spaces'
+    echo ',f             format all lines'
+endfunction
+
+nmap ,h :call PrintCustomCommonKeyBindings()<CR>

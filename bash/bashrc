@@ -1,0 +1,20 @@
+#
+# ~/.bashrc
+#
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+PS1='[\u@\h \W]\$ '
+
+alias cls='printf "\033c"'
+alias l='ls -lah'
+alias l.='ls -d .* --color=auto'
+alias la='ls -lAh'
+alias ll='ls -lh'
+alias ls='ls --color=auto "--ignore=NTUSER.DAT*" "--ignore=ntuser.dat*" --ignore=ntuser.ini'
+alias lsa='ls -lah'
+alias egrep='grep -E --color=auto'
+alias fgrep='grep -F --color=auto'
+alias grep='grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'
+alias vi='vim'

@@ -1,0 +1,9 @@
+set guifont=XHei\ Apple\ Mono\ 10
+
+highlight Pmenu guibg=darkgray guifg=white
+highlight PmenuSel guibg=grey guifg=black
+
+set guioptions-=T  " no toolbar
+set guioptions-=m  " no menubar
+set guioptions-=r  " no rscrollbar
+set guioptions-=L  " no lscrollbar
