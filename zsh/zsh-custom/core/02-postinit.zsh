@@ -230,13 +230,13 @@ fi
 
 # dnf
 if type dnf NUL; then
-    alias pacadd="$_sudo dnf --color install"
-    alias pacins="$_sudo dnf --color install"
-    alias pacrm="$_sudo dnf --color remove"
-    alias pacupd="$_sudo dnf --color upgrade"
-    alias pacfind="$_sudo dnf --color search"
-    alias pacinfo='dnf --color info'
-    alias pacls='dnf --color list installed'
+    alias pacadd="$_sudo dnf --color always install"
+    alias pacins="$_sudo dnf --color always install"
+    alias pacrm="$_sudo dnf --color always remove"
+    alias pacupd="$_sudo dnf --color always upgrade"
+    alias pacfind='dnf --color always search'
+    alias pacinfo='dnf --color always info'
+    alias pacls='dnf --color always list installed'
 fi
 
 # zypper
