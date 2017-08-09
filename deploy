@@ -12,15 +12,23 @@ function ask_yesno {
     esac
 }
 
+function copy_with_backup {
+    if [ -f "$2" ]; then
+        mv "$2" "$2.bak"
+        echo "  '$2' => '$2.bak'"
+    fi
+    cp $1 $2
+}
+
 if ! ask_yesno 'This script may overwrite any existent file. Continue?'; then
     exit 1
 fi
 
 if ask_yesno 'Install zsh dotfiles?'; then
     set -e
-    cp zsh/zshrc "$HOME/.zshrc"
+    copy_with_backup zsh/zshrc "$HOME/.zshrc"
     cp -rT zsh/zsh-custom "$HOME/.zsh-custom"
-    cp zsh/custom.zsh "$HOME/.zsh-custom/custom.zsh"
+    copy_with_backup zsh/custom.zsh "$HOME/.zsh-custom/custom.zsh"
     echo "Please edit $HOME/.zsh-custom/custom.zsh to meet your requirements."
     set +e
 fi
@@ -28,7 +36,7 @@ fi
 if ask_yesno 'Install bash dotfiles?'; then
     set -e
     for i in rc _profile; do
-        cp bash/bash$i "$HOME/.bash$i"
+        copy_with_backup bash/bash$i "$HOME/.bash$i"
     done
     set +e
 fi
@@ -36,11 +44,13 @@ fi
 if ask_yesno 'Install vim dotfiles? This will install Vundle as well.'; then
     set -e
     echo 'Please ignore any error message related to color scheme.'
-    rm -rf "$HOME/.vim/bundle/Vundle.vim"
     mkdir -p "$HOME/.vim/bundle"
+    if [ -e "$HOME/.vim/bundle/Vundle.vim" ]; then
+        rm -rf "$HOME/.vim/bundle/Vundle.vim"
+    fi
     git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
     for i in vimrc vimrc-common vimrc-commonplugins vimrc-gui vimrc-ycm; do
-        cp vim/$i "$HOME/.$i"
+        copy_with_backup vim/$i "$HOME/.$i"
     done
     cp -rT vim/vim-after "$HOME/.vim/after"
     vim +PluginInstall +qall
@@ -49,5 +59,14 @@ fi
 
 if ask_yesno 'Install tmux dotfiles?'; then
     set -e
-    cp tmux/tmux.conf "$HOME/.tmux.conf"
+    copy_with_backup tmux/tmux.conf "$HOME/.tmux.conf"
+    set +e
+fi
+
+if ask_yesno 'Install .Xresources?'; then
+    set -e
+    copy_with_backup xrdb/Xresources "$HOME/.Xresources"
+    echo 'Refreshing X resource database'
+    xrdb "$HOME/.Xresources"
+    set +e
 fi
