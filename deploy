@@ -18,13 +18,18 @@ fi
 
 _pwd=$(pwd)
 
+if ask_yesno 'Prefer symlink to copy? Note that this has no effect on ~/.gitignore and bash dotfiles'; then
+    _install='ln -svf'
+    _install_dir='ln -svf'
+else
+    _install='cp -fv'
+    _install_dir='cp -frv'
+fi
+
 if ask_yesno 'Install zsh dotfiles? This will overwrite ~/.zshrc and ~/.zsh-custom'; then
-    cp -fv "$_pwd/zsh/zshrc" "$HOME/.zshrc"
-    if ask_yesno 'Use symlink instead of copy for ~/.zsh-custom?'; then
-        ln -sf "$_pwd/zsh/zsh-custom" "$HOME/.zsh-custom"
-    else
-        rm -rvf "$HOME/.zsh-custom" && cp -rvf "$_pwd/zsh/zsh-custom" "$HOME/.zsh-custom"
-    fi
+    $_install "$_pwd/zsh/zshrc" "$HOME/.zshrc"
+    rm -rvf "$HOME/.zsh-custom" && $_install_dir "$_pwd/zsh/zsh-custom" "$HOME/.zsh-custom"
+    touch "$HOME/.zsh-custom/custom.zsh"
 fi
 
 if ask_yesno 'Install bash dotfiles? This will override ~/.bash_profile and ~/.bashrc'; then
@@ -33,11 +38,11 @@ if ask_yesno 'Install bash dotfiles? This will override ~/.bash_profile and ~/.b
 fi
 
 if ask_yesno 'Install vim dotfiles? This will overwrite ~/.vimrc{,-common,-commonplugins,-gui,-simple}'; then
-    cp -fv "$_pwd/vim/vimrc" "$HOME/.vimrc"
-    cp -fv "$_pwd/vim/vimrc-common" "$HOME/.vimrc-common"
-    cp -fv "$_pwd/vim/vimrc-commonplugins" "$HOME/.vimrc-commonplugins"
-    cp -fv "$_pwd/vim/vimrc-gui" "$HOME/.vimrc-gui"
-    cp -fv "$_pwd/vim/vimrc-simple" "$HOME/.vimrc-simple"
+    $_install "$_pwd/vim/vimrc" "$HOME/.vimrc"
+    $_install "$_pwd/vim/vimrc-common" "$HOME/.vimrc-common"
+    $_install "$_pwd/vim/vimrc-commonplugins" "$HOME/.vimrc-commonplugins"
+    $_install "$_pwd/vim/vimrc-gui" "$HOME/.vimrc-gui"
+    $_install "$_pwd/vim/vimrc-simple" "$HOME/.vimrc-simple"
     if ask_yesno 'Install plugins for vim?'; then
         if ! type git > /dev/null 2>&1; then
             echo 'git not found, skipping'
@@ -67,11 +72,11 @@ if ask_yesno 'Install ~/.gitconfig? This will not overwrite anything by default'
 fi
 
 if ask_yesno 'Install ~/.tmux.conf? This will overwrite it if exists'; then
-    cp -fv "$_pwd/tmux/tmux.conf" "$HOME/.tmux.conf"
+    $_install "$_pwd/tmux/tmux.conf" "$HOME/.tmux.conf"
 fi
 
 if ask_yesno 'Install ~/.Xresources? This will overwrite it if exists'; then
-    cp -rf "$_pwd/xrdb/Xresources" "$HOME/.Xresources"
+    $_install "$_pwd/xrdb/Xresources" "$HOME/.Xresources"
     if type xrdb > /dev/null 2>&1; then
         echo 'Refreshing X resource database'
         xrdb "$HOME/.Xresources"
