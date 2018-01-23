@@ -49,7 +49,8 @@ PROMPT="
 %{$fg[white]%}:\
 %{$terminfo[bold]$fg[yellow]%}${current_dir}%{$reset_color%}\
 ${venv_info}\
-${git_info}
+${git_info}\
+$PROMPT_POSTFIX
 %(?.%{$fg_no_bold[green]%}.%{$fg_bold[red]%})$ %{$reset_color%}"
 else
 PROMPT="
@@ -61,6 +62,6 @@ PROMPT="
 %{$terminfo[bold]$fg[yellow]%}${current_dir}%{$reset_color%}\
 ${venv_info}\
 ${git_info}\
-%(?.. [%?])
-%{$fg[green]%}# %{$reset_color%}"
+$PROMPT_POSTFIX
+%(?.%{$fg_no_bold[green]%}.%{$fg_bold[red]%})$ %{$reset_color%}"
 fi

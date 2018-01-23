@@ -5,68 +5,77 @@ function ask_yesno {
     case ${answer:0:1} in
         n|N )
             return 1
-        ;;
+            ;;
         * )
             return 0
-        ;;
+            ;;
     esac
-}
-
-function copy_with_backup {
-    if [ -f "$2" ]; then
-        mv "$2" "$2.bak"
-        echo "  '$2' => '$2.bak'"
-    fi
-    cp $1 $2
 }
 
 if ! ask_yesno 'This script may overwrite any existent file. Continue?'; then
     exit 1
 fi
 
-if ask_yesno 'Install zsh dotfiles?'; then
-    set -e
-    copy_with_backup zsh/zshrc "$HOME/.zshrc"
-    cp -rT zsh/zsh-custom "$HOME/.zsh-custom"
-    copy_with_backup zsh/custom.zsh "$HOME/.zsh-custom/custom.zsh"
-    echo "Please edit $HOME/.zsh-custom/custom.zsh to meet your requirements."
-    set +e
-fi
+_pwd=$(pwd)
 
-if ask_yesno 'Install bash dotfiles?'; then
-    set -e
-    for i in rc _profile; do
-        copy_with_backup bash/bash$i "$HOME/.bash$i"
-    done
-    set +e
-fi
-
-if ask_yesno 'Install vim dotfiles? This will install Vundle as well.'; then
-    set -e
-    echo 'Please ignore any error message related to color scheme.'
-    mkdir -p "$HOME/.vim/bundle"
-    if [ -e "$HOME/.vim/bundle/Vundle.vim" ]; then
-        rm -rf "$HOME/.vim/bundle/Vundle.vim"
+if ask_yesno 'Install zsh dotfiles? This will overwrite ~/.zshrc and ~/.zsh-custom'; then
+    cp -fv "$_pwd/zsh/zshrc" "$HOME/.zshrc"
+    if ask_yesno 'Use symlink instead of copy for ~/.zsh-custom?'; then
+        ln -sf "$_pwd/zsh/zsh-custom" "$HOME/.zsh-custom"
+    else
+        rm -rvf "$HOME/.zsh-custom" && cp -rvf "$_pwd/zsh/zsh-custom" "$HOME/.zsh-custom"
     fi
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
-    for i in vimrc vimrc-common vimrc-commonplugins vimrc-gui vimrc-ycm; do
-        copy_with_backup vim/$i "$HOME/.$i"
-    done
-    cp -rT vim/vim-after "$HOME/.vim/after"
-    vim +PluginInstall +qall
-    set +e
 fi
 
-if ask_yesno 'Install tmux dotfiles?'; then
-    set -e
-    copy_with_backup tmux/tmux.conf "$HOME/.tmux.conf"
-    set +e
+if ask_yesno 'Install bash dotfiles? This will override ~/.bash_profile and ~/.bashrc'; then
+    cp -fv "$_pwd/bash/bash_profile" "$HOME/.bash_profile"
+    cp -fv "$_pwd/bash/bashrc" "$HOME/.bashrc"
 fi
 
-if ask_yesno 'Install .Xresources?'; then
-    set -e
-    copy_with_backup xrdb/Xresources "$HOME/.Xresources"
-    echo 'Refreshing X resource database'
-    xrdb "$HOME/.Xresources"
-    set +e
+if ask_yesno 'Install vim dotfiles? This will overwrite ~/.vimrc{,-common,-commonplugins,-gui,-simple}'; then
+    cp -fv "$_pwd/vim/vimrc" "$HOME/.vimrc"
+    cp -fv "$_pwd/vim/vimrc-common" "$HOME/.vimrc-common"
+    cp -fv "$_pwd/vim/vimrc-commonplugins" "$HOME/.vimrc-commonplugins"
+    cp -fv "$_pwd/vim/vimrc-gui" "$HOME/.vimrc-gui"
+    cp -fv "$_pwd/vim/vimrc-simple" "$HOME/.vimrc-simple"
+    if ask_yesno 'Install plugins for vim?'; then
+        if ! type git > /dev/null 2>&1; then
+            echo 'git not found, skipping'
+        elif ! type vim > /dev/null 2>&1; then
+            echo 'vim not found, skipping'
+        else
+            _vundle_path="$HOME/.vim/bundle/Vundle.vim"
+            if ! [[ -e "$_vundle_path" ]]; then
+                git clone https://github.com/VundleVim/Vundle.vim.git "$_vundle_path"
+            fi
+            echo 'Please ignore any error related to color scheme'
+            vim +PluginInstall +qall
+        fi
+    fi
+fi
+
+if ask_yesno 'Install ~/.gitconfig? This will not overwrite anything by default'; then
+    if [[ -f "$HOME/.gitconfig" ]]; then
+        if ask_yesno '~/.gitconfig exists, append to it?'; then
+            cat "$_pwd/git/gitconfig" >> "$HOME/.gitconfig"
+        elif ! ask_yesno 'keep it? n for overwrite it'; then
+            cp -fv "$_pwd/git/gitconfig" "$HOME/.gitconfig"
+        fi
+    else
+        cp -fv "$_pwd/git/gitconfig" "$HOME/.gitconfig"
+    fi
+fi
+
+if ask_yesno 'Install ~/.tmux.conf? This will overwrite it if exists'; then
+    cp -fv "$_pwd/tmux/tmux.conf" "$HOME/.tmux.conf"
+fi
+
+if ask_yesno 'Install ~/.Xresources? This will overwrite it if exists'; then
+    cp -rf "$_pwd/xrdb/Xresources" "$HOME/.Xresources"
+    if type xrdb > /dev/null 2>&1; then
+        echo 'Refreshing X resource database'
+        xrdb "$HOME/.Xresources"
+    else
+        echo 'xrdb not found, skipping'
+    fi
 fi

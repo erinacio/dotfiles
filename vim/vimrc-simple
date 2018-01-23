@@ -1,0 +1,25 @@
+set nocompatible
+filetype plugin indent on
+set ruler
+set hlsearch
+syntax enable
+syntax on
+set background=dark
+colorscheme koehler
+set backspace=indent,eol,start
+set encoding=utf-8
+set fileencodings=utf-8
+set ffs=unix
+set ambiwidth=double
+set linebreak
+set fo+=mB
+set number
+set shiftwidth=4
+set tabstop=4
+set expandtab
+set softtabstop=4
+set autoindent
+set ssop-=options
+set ssop-=folds
+set cinoptions=N-s:0l1 " no indent in namespace
+set mouse=a

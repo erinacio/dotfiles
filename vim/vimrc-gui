@@ -1,4 +1,4 @@
-set guifont=XHei\ Apple\ Mono\ 10
+set guifont=XHei\ Apple\ Mono:h13
 
 highlight Pmenu guibg=darkgray guifg=white
 highlight PmenuSel guibg=grey guifg=black

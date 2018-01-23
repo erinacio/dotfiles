@@ -25,10 +25,10 @@ set ssop-=folds
 set cinoptions=N-s:0l1 " no indent in namespace
 
 set mouse=a
-set clipboard=unnamedplus
 set t_Co=256
+set clipboard=unnamed
 
-set colorcolumn=80,92,120,150
+set colorcolumn=120,150
 
 set foldmethod=marker
 
@@ -70,13 +70,15 @@ nmap ,f gg=G
 function ExecuteCurrentFile()
     write
     if &filetype == 'python'
-        ! python %
+        ! python3 %
     elseif &filetype == 'perl'
         ! perl %
     elseif &filetype == 'c'
         ! gcc % -o /tmp/a.out && /tmp/a.out
     elseif &filetype == 'cpp'
         ! g++ % -o /tmp/a.out && /tmp/a.out
+    elseif &filetype == 'go'
+        ! go run %
     end
 endfunction
 
