@@ -14,6 +14,15 @@ alias la='ls -lAh'
 alias ll='ls -lh'
 alias lsa='ls -lah'
 
+## cd
+alias cdbin='cd "$HOME/.local/bin"'
+alias cdsrc='cd "$HOME/src"'
+alias cdproj='cd "$HOME/Projects"'
+alias cdmisc='cd "$HOME/Miscellaneous"'
+if type go NUL; then
+    alias cdgo='cd "$GOPATH"'
+fi
+
 ## grep related aliases
 alias grep="grep --color=auto"
 alias egrep='grep -E'
