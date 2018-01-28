@@ -69,16 +69,20 @@ nmap ,f gg=G
 
 function ExecuteCurrentFile()
     write
-    if &filetype == 'python'
-        ! python3 %
-    elseif &filetype == 'perl'
-        ! perl %
-    elseif &filetype == 'c'
-        ! gcc % -o /tmp/a.out && /tmp/a.out
+    if &filetype == 'c'
+        ! gcc % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
     elseif &filetype == 'cpp'
-        ! g++ % -o /tmp/a.out && /tmp/a.out
+        ! g++ % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
     elseif &filetype == 'go'
         ! go run %
+    elseif getline(1) =~# '^#!/.*$'
+        exe "!" . strpart(getline(1), 2) . " " . shellescape(expand("%"))
+    elseif &filetype == 'python'
+        ! python %
+    elseif &filetype == 'perl'
+        ! perl %
+    elseif &filetype == 'sh'
+        ! bash %
     end
 endfunction
 
@@ -87,7 +91,7 @@ function PrintCustomCommonKeyBindings()
     echo '<F2>           toggle nerd tree'
     echo '<F3>           quick quit and preserve session'
     echo '<F4>           quit all'
-    echo '<F5>           make'
+    echo '<F5>           execute'
     echo '<F6>           shell'
     echo '<C-left/right> change tab'
     echo '<S-left/right> move tab'
