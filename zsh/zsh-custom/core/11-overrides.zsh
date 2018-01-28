@@ -83,7 +83,7 @@ setopt no_beep # don't beep on error
 setopt interactive_comments # Allow comments even in interactive shells (especially for Muness)
 
 # ===== Changing Directories
-setopt auto_cd # If you type foo, and it isn't a command, and it is a directory in your cdpath, go there
+# setopt auto_cd # If you type foo, and it isn't a command, and it is a directory in your cdpath, go there
 setopt pushd_ignore_dups # don't push multiple copies of the same directory onto the directory stack
 
 # ===== Expansion and Globbing
@@ -115,3 +115,5 @@ setopt transient_rprompt # only show the rprompt on the current prompt
 
 # ===== Scripts and Functions
 setopt multios # perform implicit tees or cats when multiple redirections are attempted
+
+setopt cdablevars
