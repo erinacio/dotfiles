@@ -33,7 +33,11 @@ if ! [[ "$(uname -s)" =~ '^CYGWIN|^MSYS|^MINGW' ]]; then
     local venv_info='$(ys_venv_prompt_info)'
     function ys_venv_prompt_info() {
         if [ -n "${VIRTUAL_ENV}" ]; then
-            echo -n " %{$reset_color%}(venv:%{$fg[green]%}`basename \"$VIRTUAL_ENV\"`%{$reset_color%})"
+            local _venv_basename="${VIRTUAL_ENV##*/}"
+            if [[ "$_venv_basename" == ".venv" ]]; then  # pipenv local virtualenv
+                local _venv_basename="${${VIRTUAL_ENV%/*}##*/}"
+            fi
+            echo -n " %{$reset_color%}(venv:%{$fg[green]%}$_venv_basename%{$reset_color%})"
         fi
     }
 else
