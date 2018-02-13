@@ -63,6 +63,7 @@ nmap <F3> :wall<CR>:mksession!<CR>:qall<CR>
 nmap <F4> :qall<CR>
 nmap <F5> :call ExecuteCurrentFile()<CR>
 nmap <F6> :shell<CR>
+nmap <F7> :make<CR>
 
 nmap ,s :%s/\s\+$<CR>
 nmap ,f gg=G
