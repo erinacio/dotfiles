@@ -71,9 +71,9 @@ nmap ,f gg=G
 function ExecuteCurrentFile()
     write
     if &filetype == 'c'
-        ! gcc % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
+        ! gcc -std=gnu11 % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
     elseif &filetype == 'cpp'
-        ! g++ % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
+        ! g++ -std=gnu++14 % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
     elseif &filetype == 'go'
         ! go run %
     elseif getline(1) =~# '^#!/.*$'
