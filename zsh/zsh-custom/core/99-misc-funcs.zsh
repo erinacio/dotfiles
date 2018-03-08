@@ -4,3 +4,12 @@ function paths () {
         echo "$p"
     done
 }
+
+function cdtmp () {
+    mkdir -p "/tmp/${USER}" && pushd "/tmp/${USER}"
+}
+
+function newtmp () {
+    local _tmpdir="$(/usr/bin/mktemp -d "/tmp/tmp.$USER.$(/bin/date +%Y%m%d-%H%M%S).XXXXXXXX")"
+    mkdir -p "$_tmpdir" && pushd "$_tmpdir"
+}
