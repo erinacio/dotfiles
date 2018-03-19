@@ -84,6 +84,8 @@ function ExecuteCurrentFile()
         ! perl %
     elseif &filetype == 'sh'
         ! bash %
+    elseif &filetype == 'javascript'
+        ! node %
     end
 endfunction
 
