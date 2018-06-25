@@ -3,8 +3,9 @@ if ismsys; then
     alias ls='ls --color=auto "--ignore=NTUSER.DAT*" "--ignore=ntuser.dat*" --ignore=ntuser.ini'
 elif islinux; then
     alias ls='ls --color=auto'
-elif isdarwin && type gls NUL; then
-    alias ls="gls --color=auto"
+elif isdarwin; then
+    export CLICOLOR=1
+    export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
 fi
 
 ## ls related aliases
