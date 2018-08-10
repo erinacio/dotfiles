@@ -29,6 +29,16 @@ alias grep="grep --color=auto"
 alias egrep='grep -E'
 alias fgrep='grep -F'
 
+## checksum calculator in coreutils
+if isdarwin && type gmd5sum NUL; then
+    alias md5sum=gmd5sum
+    alias sha1sum=gsha1sum
+    alias sha224sum=gsha224sum
+    alias sha256sum=gsha256sum
+    alias sha384sum=gsha384sum
+    alias sha512sum=gsha512sum
+fi
+
 ## docker
 if ! isdarwin && type sudo NUL && type docker NUL; then
     alias docker-orig="$(which docker)"

@@ -22,7 +22,7 @@ set softtabstop=4
 set autoindent
 set ssop-=options
 set ssop-=folds
-set cinoptions=N-s:0l1 " no indent in namespace
+set cinoptions=N-s:0l1,g0 " no indent in namespace and private/public
 
 set mouse=a
 set t_Co=256
@@ -86,6 +86,8 @@ function ExecuteCurrentFile()
         ! bash %
     elseif &filetype == 'javascript'
         ! node %
+    elseif &filetype == 'groovy'
+        ! groovy %
     end
 endfunction
 
@@ -104,3 +106,14 @@ function PrintCustomCommonKeyBindings()
 endfunction
 
 nmap ,h :call PrintCustomCommonKeyBindings()<CR>
+
+function Indent2()
+    set shiftwidth=2
+    set tabstop=2
+endfunction
+
+autocmd FileType html call Indent2()
+autocmd FileType json call Indent2()
+autocmd FileType javascript call Indent2()
+autocmd FileType xml call Indent2()
+autocmd FileType css call Indent2()
