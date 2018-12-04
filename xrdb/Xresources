@@ -33,7 +33,7 @@ URxvt.keysym.M-Escape:perl:keyboard-select:activate
 URxvt.keysym.Control-Shift-V:     perl:pasta:paste
 URxvt.clipboard.autocopy: true
 
-Xft.dpi:        96
+Xft.dpi:        120
 Xft.antialias:  true
 Xft.rgba:       rgb
 Xft.hinting:    false
@@ -82,4 +82,4 @@ URxvt*color15: #d0d0d0
 
 XTerm.vt100.foreground: black
 XTerm.vt100.background: white
-XTerm.vt100.faceName: xft:XHei Apple Mono:pixelsize=12:antialias=true
+XTerm.vt100.faceName: xft:XHei Apple Mono:pixelsize=16:antialias=true

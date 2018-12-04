@@ -26,7 +26,11 @@ set cinoptions=N-s:0l1,g0 " no indent in namespace and private/public
 
 set mouse=a
 set t_Co=256
-set clipboard=unnamed
+if has("gui_macvim")
+    set clipboard=unnamed
+else
+    set clipboard=unnamedplus
+endif
 
 set colorcolumn=120,150
 
