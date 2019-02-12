@@ -666,6 +666,42 @@ function cd {
     fi
 }
 
+function uptill {
+    [[ -z $1 || ${#argv} -gt 1 ]] && return 255
+    local -a parts; parts=("${(s./.)PWD}")
+    local n=0
+    for part in ${(Oa)parts}; do
+        if [[ $part == $1 ]]; then
+            local to_dir="${PWD}"
+            for (( i = 0; i < n; i++ )); do
+                to_dir=${to_dir:h}
+            done
+            cd "$to_dir"
+            return $?
+        fi
+        (( n = n + 1 ))
+    done
+    echo "$0: pattern $1 not found" >&2
+    return 255
+}
+
+
+function _uptill {
+    local state
+    local -a parts
+    parts=("${(s./.)PWD}")
+    parts=(${(Oa)parts})
+    shift parts
+
+    _arguments \
+        '1: :->part'
+
+    case $state in
+        part) compadd -- $parts;;
+    esac
+}
+compdef _uptill uptill
+
 
 if (( $no_dynamic )); then
 else
