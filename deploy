@@ -28,9 +28,9 @@ fi
 
 if ask_yesno 'Install zsh dotfiles? This will overwrite ~/.zshrc and ~/.zsh-custom'; then
     [ -f "$HOME/.zshrc" ] && cp -fv "$HOME/.zshrc" "$HOME/.zshrc.old"
+    rm -rvf "$HOME/.zshrc"
     echo 'source "${ZDOTDIR:-${HOME}}/.zsh-custom/init.zsh"' >"$HOME/.zshrc"
     rm -rvf "$HOME/.zsh-custom" && $_install_dir "$_pwd/zsh/zsh-custom" "$HOME/.zsh-custom"
-    touch "$HOME/.zsh-custom/custom.zsh"
 fi
 
 if ask_yesno 'Install bash dotfiles? This will override ~/.bash_profile and ~/.bashrc'; then
