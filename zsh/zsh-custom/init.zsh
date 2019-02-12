@@ -290,9 +290,6 @@ if [[ -z $EDITOR ]]; then
     if has_command vim; then
         export EDITOR=${commands[vim]}
     fi
-    if is_darwin && has_command mvim; then
-        export EDITOR=${commands[mvim]}
-    fi
 fi
 
 
