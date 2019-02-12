@@ -196,7 +196,7 @@ function git_simple_status {
         return 2
     fi
 
-    local git_status=$(command git status -sb --no-column --no-ahead-behind --no-renames 2>/dev/null)
+    local git_status=$(command git status -sb 2>/dev/null)
     if [[ -z $git_status ]]; then
         return 1
     fi
