@@ -1,4 +1,2 @@
-/zsh/zsh-custom/custom.zsh
-/zsh/zsh-custom/mod/*
-!/zsh/zsh-custom/mod/iterm2.zsh
-!/zsh/zsh-custom/mod/pipenv
+/zsh/zsh-custom/*
+!/zsh/zsh-custom/*.zsh
