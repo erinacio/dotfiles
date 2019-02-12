@@ -72,6 +72,8 @@ unsetopt beep
 
 ## ZSH internal envs
 
+source "${ZDOTDIR:-${HOME}}/.zshenv"
+
 HISTFILE=${HISTFILE:-${ZDOTDIR:-${HOME}}/.zsh_history}
 HISTSIZE=5000
 SAVEHIST=10000
