@@ -11,6 +11,7 @@ plugin.completion
 )
 
 post_scripts=(
+plugin.iterm2
 plugin.syntax-highlighting
 )
 
