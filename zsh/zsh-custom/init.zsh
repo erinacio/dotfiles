@@ -346,8 +346,10 @@ else
 fi
 
 has_command dircolors && eval $(dircolors -b)
-export CLICOLOR=1
-
+if is_darwin || is_freebsd; then
+    export CLICOLOR=1
+    export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
+fi
 
 ## Misc
 # automatically remove duplicates from these arrays
