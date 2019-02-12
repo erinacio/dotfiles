@@ -26,10 +26,13 @@ else
     _install_dir='cp -frv'
 fi
 
-if ask_yesno 'Install zsh dotfiles? This will overwrite ~/.zshrc and ~/.zsh-custom'; then
+if ask_yesno 'Install zsh dotfiles? This will overwrite ~/.zshrc, ~/.zlogin and ~/.zsh-custom'; then
     [ -f "$HOME/.zshrc" ] && cp -fv "$HOME/.zshrc" "$HOME/.zshrc.old"
     rm -rvf "$HOME/.zshrc"
     echo 'source "${ZDOTDIR:-${HOME}}/.zsh-custom/init.zsh"' >"$HOME/.zshrc"
+    [ -f "$HOME/.zlogin" ] && cp -fv "$HOME/.zlogin" "$HOME/.zlogin.old"
+    rm -rvf "$HOME/.zlogin"
+    echo 'source "${ZDOTDIR:-${HOME}}/.zshenv"' >"$HOME/.zlogin"
     rm -rvf "$HOME/.zsh-custom" && $_install_dir "$_pwd/zsh/zsh-custom" "$HOME/.zsh-custom"
 fi
 
