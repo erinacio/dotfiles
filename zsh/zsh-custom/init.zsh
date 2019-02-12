@@ -196,13 +196,17 @@ function git_simple_status {
         return 2
     fi
 
-    local git_status=$(command git status -sb 2>/dev/null)
+    local git_status="$(command git status -sb 2>/dev/null)"
     if [[ -z $git_status ]]; then
         return 1
     fi
-    local lines=("${(f)git_status}")
-    local branch_line_parts=("${(s. .)lines[1]}")
-    local branch_parts=("${(s:...:)branch_line_parts[2]}")
+    # zsh 5.0 will first do variable expension, constructed command like:
+    #   local 'lines=( foo bar )'
+    # and then executes builtin command 'local', this leads to strange behavior
+    # if array content has special character
+    local -a lines; lines=( "${(f)git_status}" )
+    local -a branch_line_parts; branch_line_parts=("${(s. .)lines[1]}")
+    local -a branch_parts; branch_parts=("${(s:...:)branch_line_parts[2]}")
     local branch="$branch_parts[1]"
     local remote_branch="$branch_parts[2]"
     local stat_first_line="$lines[2]"
@@ -596,8 +600,8 @@ function _prompt_tag_git {
     if (( $? )) || [[ -z $simple_status ]]; then
         return
     fi
-    local status_parts=("${(f)simple_status}")
-    local branch_parts=("${(s. .)status_parts[1]}")
+    local -a status_parts; status_parts=("${(f)simple_status}")
+    local -a branch_parts; branch_parts=("${(s. .)status_parts[1]}")
     print -n "%Bgit%b:%{$fg_no_bold[green]$branch_parts[1]"
     case $status_parts[2] in
         clean) ;;
@@ -610,7 +614,7 @@ function _prompt_tag_git {
 prompt_tag_functions+=_prompt_tag_git
 
 function _prompt_tag_proxy {
-    local proxies=()
+    local -a proxies
     [[ -n $ALL_PROXY   || -n $all_proxy   ]] && proxies+=all
     [[ -n $HTTP_PROXY  || -n $http_proxy  ]] && proxies+=http
     [[ -n $HTTPS_PROXY || -n $https_proxy ]] && proxies+=https
