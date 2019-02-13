@@ -655,6 +655,13 @@ function vienv {
     ${EDITOR:-vi} "${ZDOTDIR:-${HOME}}/.zshenv"
 }
 
+function newtmp {
+    local fmt="/tmp/tmp.$USER.${(%):-%D{%Y%m%d-%H%M%S}}.XXXXXXXXXX"
+    # zsh has problems in parsing prompt expansion with braces in it, leaving a dangling brace
+    local tmpdir="$(command mktemp -d "${fmt//\}/}")"
+    [[ -n $tmpdir ]] && builtin cd "$tmpdir"
+}
+
 # smart cd function, allows switching to /etc when running 'cd /etc/fstab'
 function cd {
     if (( ${#argv} == 1 )) && [[ -f ${1} ]]; then
