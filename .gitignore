@@ -1,2 +1,3 @@
 /zsh/zsh-custom/*
 !/zsh/zsh-custom/*.zsh
+!/zsh/zsh-custom/functions/

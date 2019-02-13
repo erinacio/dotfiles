@@ -89,6 +89,8 @@ ZSH_NO_DEFAULT_LOCALE=${ZSH_NO_DEFAULT_LOCALE:-0}
 
 REPORT_TIME=1
 
+fpath+="$ZSH_CUSTOM_DIR/functions"
+
 
 ## Core helper functions
 function has_command {
