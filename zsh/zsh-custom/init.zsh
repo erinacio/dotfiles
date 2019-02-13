@@ -71,14 +71,54 @@ setopt multios
 unsetopt beep
 
 
-## ZSH internal envs
+## Core helper functions
+_kernel_name="$(command uname -s)"
 
+function is_linux {
+    [[ $_kernel_name == "Linux" ]]
+}
+
+function is_darwin {
+    [[ $_kernel_name == "Darwin" ]]
+}
+
+function is_freebsd {
+    [[ $_kernel_name == "FreeBSD" ]]
+}
+
+function is_openbsd {
+    [[ $_kernel_name == "OpenBSD" ]]
+}
+
+function is_cygwin {
+    [[ $_kernel_name == CYGWIN_NT-* ]]
+}
+
+function is_msys {
+    [[ $_kernel_name == "${MSYSTEM}_NT-"* ]]
+}
+
+function is_ssh {
+    [[ -n $SSH_TTY ]]
+}
+
+function has_command {
+    (( ${+commands[$1]} ))
+}
+
+
+## ZSH internal envs
 source "${ZDOTDIR:-${HOME}}/.zshenv"
 
 HISTFILE=${HISTFILE:-${ZDOTDIR:-${HOME}}/.zsh_history}
-HISTSIZE=5000
-SAVEHIST=10000
-
+HISTSIZE=1000
+if is_linux; then
+    # Large HISTSIZE is only ok when using Linux, because when you malloc
+    # a huge chunk of memory and don't use it, no actual memory allocation
+    # is performed on Linux, which may be performed on other OS.
+    HISTSIZE=5000
+fi
+SAVEHIST=100000
 DIRSTACKSIZE=${DIRSTACKSIZE:-50}
 
 NOCOR=${NOCOR:-0}
@@ -91,12 +131,7 @@ REPORT_TIME=1
 
 fpath+="$ZSH_CUSTOM_DIR/functions"
 
-
-## Core helper functions
-function has_command {
-    (( ${+commands[$1]} ))
-}
-
+## Misc helper functions
 function ask_yesno {
     local default_ret=0
     while true; do
@@ -127,36 +162,6 @@ function ask_yesno {
         n|N) return 1;;
         *)   return $default_ret;;
     esac
-}
-
-_kernel_name="$(command uname -s)"
-
-function is_linux {
-    [[ $_kernel_name == "Linux" ]]
-}
-
-function is_darwin {
-    [[ $_kernel_name == "Darwin" ]]
-}
-
-function is_freebsd {
-    [[ $_kernel_name == "FreeBSD" ]]
-}
-
-function is_openbsd {
-    [[ $_kernel_name == "OpenBSD" ]]
-}
-
-function is_cygwin {
-    [[ $_kernel_name == CYGWIN_NT-* ]]
-}
-
-function is_msys {
-    [[ $_kernel_name == "${MSYSTEM}_NT-"* ]]
-}
-
-function is_ssh {
-    [[ -n $SSH_TTY ]]
 }
 
 
