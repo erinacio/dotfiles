@@ -637,7 +637,7 @@ alias -g DN=/dev/null
 alias -g NUL="> /dev/null 2>&1"
 alias -g NE="2> /dev/null"
 
-if has_command sudo && has_command docker; then
+if is_linux && has_command sudo && has_command docker; then
     alias docker='sudo docker'
 fi
 
