@@ -372,7 +372,7 @@ zmodload -ap zsh/mapfile mapfile
 ## Completion
 COMPDUMPFILE=${COMPDUMPFILE:-${ZDOTDIR:-${HOME}}/.zcompdump}
 if autoload -Uz compinit ; then
-    compinit -d ${COMPDUMPFILE}
+    compinit -C -d ${COMPDUMPFILE}
 fi
 
 # allow one error for every three characters typed in approximate completer
