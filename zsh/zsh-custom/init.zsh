@@ -594,6 +594,7 @@ function _prompt_local_prompt {
         done
     fi
     print
+    [[ -e $PWD ]] || print -n "(deleted) "
     print -n "%{$reset_color%}%(?.%{$fg_no_bold[green]%}.%{$fg_bold[red]%})%%%{$reset_color%} "
 }
 
