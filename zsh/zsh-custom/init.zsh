@@ -206,7 +206,7 @@ function git_simple_status {
         return 2
     fi
 
-    local git_status="$(command git status -sb 2>/dev/null)"
+    local git_status="$(LANG=C LC_ALL=C command git status -sb --porcelain=v1 2>/dev/null)"
     if [[ -z $git_status ]]; then
         return 1
     fi
@@ -221,7 +221,9 @@ function git_simple_status {
     local remote_branch="$branch_parts[2]"
     local stat_first_line="$lines[2]"
     if (( $display_branch )); then
-        if [[ $branch == "HEAD" ]]; then
+        if [[ "$branch_line_parts[2]" == "No" && "$branch_line_parts[3]" == "commits" ]]; then
+            echo "$branch_line_parts[6]"
+        elif [[ $branch == "HEAD" ]]; then
             command git rev-parse --short HEAD 2>/dev/null || echo '?unknown?'
         elif [[ -z $remote_branch ]]; then
             echo "$branch"
