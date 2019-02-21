@@ -170,74 +170,24 @@ function git_repo_root {
     git rev-parse --show-toplevel 2>/dev/null
 }
 
-function git_simple_status {
-    local display_branch=0
-    local display_remote_branch=0
-    while (( ${#argv} > 0 )); do
-        case $1 in
-            -b)
-                display_branch=1
-                shift 1
-                ;;
-            -r)
-                display_remote_branch=1
-                shift 1
-                ;;
-            -h)
-                echo "$0 [-b] [-r]"
-                echo 'options:'
-                echo '    -b  show branch info'
-                echo '    -r  also show tracking remote branch info if possible'
-                return 0
-                ;;
-            -*)
-                echo "$0: unknown option $1"
-                return 255
-                ;;
-            *)
-                printf '%s: unknown argument %q\n' "$0" "$1"
-                return 255
-                ;;
-        esac
-    done
+function git_head_info {
+    # result: <commit-name> [<branch-name>] [<remote-branch-name>]
 
-    if ! has_command git; then
-        echo "$0: no git command found" >&2
-        return 2
+    local commit_name; commit_name="$(command git describe --tags --always 2>/dev/null)"
+    #local commit_name; commit_name="$(git rev-parse --short HEAD 2>/dev/null)"
+    local head_ref; head_ref="$(command git symbolic-ref -q HEAD 2>/dev/null)"
+    local branch_info=''
+    if [[ -n $head_ref ]]; then
+        branch_info="$(command git for-each-ref --format='%(refname:short) %(upstream:short)' $head_ref 2>/dev/null)"
+    fi
+    if [[ -z $commit_name && -n $head_ref ]]; then
+        local -a ref_parts; ref_parts=("${(s./.)head_ref}")
+        commit_name="<empty>"
+        branch_info="$ref_parts[3]"
     fi
 
-    local git_status="$(LANG=C LC_ALL=C command git status -sb --porcelain=v1 2>/dev/null)"
-    if [[ -z $git_status ]]; then
-        return 1
-    fi
-    # zsh 5.0 will first do variable expension, constructed command like:
-    #   local 'lines=( foo bar )'
-    # and then executes builtin command 'local', this leads to strange behavior
-    # if array content has special character
-    local -a lines; lines=( "${(f)git_status}" )
-    local -a branch_line_parts; branch_line_parts=("${(s. .)lines[1]}")
-    local -a branch_parts; branch_parts=("${(s:...:)branch_line_parts[2]}")
-    local branch="$branch_parts[1]"
-    local remote_branch="$branch_parts[2]"
-    local stat_first_line="$lines[2]"
-    if (( $display_branch )); then
-        if [[ "$branch_line_parts[2]" == "No" && "$branch_line_parts[3]" == "commits" ]]; then
-            echo "$branch_line_parts[6]"
-        elif [[ $branch == "HEAD" ]]; then
-            command git rev-parse --short HEAD 2>/dev/null || echo '?unknown?'
-        elif [[ -z $remote_branch ]]; then
-            echo "$branch"
-        elif (( $display_remote_branch )); then
-            echo "$branch $remote_branch"
-        else
-            echo "$branch"
-        fi
-    fi
-    if [[ -z $stat_first_line ]]; then
-        echo "clean"
-    else
-        echo "dirty"
-    fi
+    local info_line; info_line="$commit_name $branch_info"
+    echo "$info_line"
 }
 
 function git_is_repo {
@@ -609,19 +559,16 @@ if autoload -Uz promptinit && promptinit; then
 fi
 
 function _prompt_tag_git {
-    local simple_status="$(git_simple_status -b -r)"
-    if (( $? )) || [[ -z $simple_status ]]; then
-        return
-    fi
-    local -a status_parts; status_parts=("${(f)simple_status}")
-    local -a branch_parts; branch_parts=("${(s. .)status_parts[1]}")
-    print -n "%Bgit%b:%{$fg_no_bold[green]$branch_parts[1]"
-    case $status_parts[2] in
-        clean) ;;
-        dirty) print -n "$fg_bold[red]!";;
-        *) print -n "$fg_no_bold[red]?";;
-    esac
-    [[ -n $branch_parts[2] ]] && print -n -- "$reset_color->$fg_no_bold[cyan]$branch_parts[2]"
+    local head_info; head_info="$(git_head_info)"
+    local -a head_info_parts; head_info_parts=("${(s. .)head_info}")
+    local commit_name; commit_name="$head_info_parts[1]"
+    local branch_name; branch_name="$head_info_parts[2]"
+    # local remote_name; remote_name="$head_info_parts[3]"
+    [[ -z $commit_name ]] && return
+    print -n -- "%Bgit%b%{"
+    [[ -n $branch_name ]] && print -n -- ":$fg_no_bold[green]$branch_name"
+    print -n -- "$reset_color:$commit_name"
+    # [[ -n $remote_name ]] && print -n -- "$reset_color->$fg_no_bold[cyan]$remote_name"
     print -n '%}'
 }
 prompt_tag_functions+=_prompt_tag_git
