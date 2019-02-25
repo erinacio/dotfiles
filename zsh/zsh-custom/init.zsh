@@ -625,6 +625,7 @@ function cd {
 }
 
 
+autoload -Uz git-for-each
 autoload -Uz newtmp
 autoload -Uz up
 autoload -Uz sshtmux

@@ -1,0 +1,14 @@
+local once_failed=0
+for repo in ./**/.git; do
+    echo "> $fg_no_bold[green]${repo:h}$reset_color"
+    (builtin cd "${repo:h}" && command git "$@")
+    if (( $? != 0 )); then
+        echo "$fg_bold[red]FAILED$reset_color"
+        once_failed=1
+    else
+        echo "$fg_no_bold[green]OK$reset_color"
+    fi
+done
+return $once_failed
+
+# vim: ft=zsh sw=4 ts=4 et
