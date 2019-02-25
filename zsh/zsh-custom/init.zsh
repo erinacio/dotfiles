@@ -490,6 +490,7 @@ key[PageDown]=${terminfo[knp]}
 key[ShiftTab]=${terminfo[kcbt]}
 
 # setup key accordingly
+bindkey -e
 [[ -n "${key[Home]}"    ]]   && bindkey  "${key[Home]}"     beginning-of-line
 [[ -n "${key[End]}"     ]]   && bindkey  "${key[End]}"      end-of-line
 [[ -n "${key[Insert]}"  ]]   && bindkey  "${key[Insert]}"   overwrite-mode
