@@ -1,0 +1,6 @@
+local fmt="/tmp/tmp.$USER.${(%):-%D{%Y%m%d-%H%M%S}}.XXXXXXXXXX"
+# zsh has problems in parsing prompt expansion with braces in it, leaving a dangling brace
+local tmpdir="$(command mktemp -d "${fmt//\}/}")"
+[[ -n $tmpdir ]] && builtin cd "$tmpdir"
+
+# vim: ft=zsh sw=4 ts=4 et

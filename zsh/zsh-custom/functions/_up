@@ -1,0 +1,16 @@
+#compdef up
+
+local state
+local -a parts
+parts=("${(s./.)PWD}")
+parts=(${(Oa)parts})
+shift parts
+
+_arguments \
+    '1: :->part'
+
+case $state in
+    part) compadd -- $parts;;
+esac
+
+# vim: ft=zsh sw=4 ts=4 et

@@ -613,13 +613,6 @@ function vienv {
     ${EDITOR:-vi} "${ZDOTDIR:-${HOME}}/.zshenv"
 }
 
-function newtmp {
-    local fmt="/tmp/tmp.$USER.${(%):-%D{%Y%m%d-%H%M%S}}.XXXXXXXXXX"
-    # zsh has problems in parsing prompt expansion with braces in it, leaving a dangling brace
-    local tmpdir="$(command mktemp -d "${fmt//\}/}")"
-    [[ -n $tmpdir ]] && builtin cd "$tmpdir"
-}
-
 # smart cd function, allows switching to /etc when running 'cd /etc/fstab'
 function cd {
     if (( ${#argv} == 1 )) && [[ -f ${1} ]]; then
@@ -631,41 +624,9 @@ function cd {
     fi
 }
 
-function uptill {
-    [[ -z $1 || ${#argv} -gt 1 ]] && return 255
-    local -a parts; parts=("${(s./.)PWD}")
-    local n=0
-    for part in ${(Oa)parts}; do
-        if [[ $part == $1 ]]; then
-            local to_dir="${PWD}"
-            for (( i = 0; i < n; i++ )); do
-                to_dir=${to_dir:h}
-            done
-            cd "$to_dir"
-            return $?
-        fi
-        (( n = n + 1 ))
-    done
-    echo "$0: pattern $1 not found" >&2
-    return 255
-}
 
-
-function _uptill {
-    local state
-    local -a parts
-    parts=("${(s./.)PWD}")
-    parts=(${(Oa)parts})
-    shift parts
-
-    _arguments \
-        '1: :->part'
-
-    case $state in
-        part) compadd -- $parts;;
-    esac
-}
-compdef _uptill uptill
+autoload -Uz newtmp
+autoload -Uz up
 
 
 if (( $no_dynamic )); then
