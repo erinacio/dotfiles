@@ -627,6 +627,7 @@ function cd {
 
 autoload -Uz newtmp
 autoload -Uz up
+autoload -Uz sshtmux
 
 
 if (( $no_dynamic )); then

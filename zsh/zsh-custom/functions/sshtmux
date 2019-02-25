@@ -1,0 +1,8 @@
+if [[ ${#argv} -gt 2 || ${#argv} -le 0 ]]; then
+    echo "$1 <ssh-host> [<tmux-session>]"
+    return 1
+fi
+
+ssh -t "$1" "LANG=$LANG" exec tmux new-session -A -s ${2:-main}
+
+# vim: ft=zsh sw=4 ts=4 et
