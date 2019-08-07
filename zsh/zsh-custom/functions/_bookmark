@@ -1,0 +1,12 @@
+#compdef bookmark
+# https://zhuanlan.zhihu.com/p/57659856
+
+local MARKPATH="${MARKPATH:-$HOME/.local/share/marks}"
+if [[ "${1}${2}" == "-"* ]]; then
+    reply=($(command ls -1 "$MARKPATH" 2> /dev/null | \
+        awk '{print "-"$0}'))
+else
+    reply=($(command ls -1 "$MARKPATH" 2> /dev/null))
+fi
+
+# vim: ft=zsh sw=4 ts=4 et
