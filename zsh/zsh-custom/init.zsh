@@ -32,7 +32,6 @@ setopt pushd_ignore_dups
 
 setopt always_to_end
 setopt auto_menu
-setopt auto_name_dirs
 setopt complete_in_word
 setopt list_packed
 setopt hash_list_all
