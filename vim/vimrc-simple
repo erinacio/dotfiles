@@ -23,3 +23,4 @@ set ssop-=options
 set ssop-=folds
 set cinoptions=N-s:0l1 " no indent in namespace
 set mouse=a
+command W w !sudo tee % > /dev/null
