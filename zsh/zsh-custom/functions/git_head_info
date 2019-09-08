@@ -1,0 +1,19 @@
+# result: <commit-name> [<branch-name>] [<remote-branch-name>]
+
+local commit_name; commit_name="$(command git describe --tags --always 2>/dev/null)"
+#local commit_name; commit_name="$(git rev-parse --short HEAD 2>/dev/null)"
+local head_ref; head_ref="$(command git symbolic-ref -q HEAD 2>/dev/null)"
+local branch_info=''
+if [[ -n $head_ref ]]; then
+    branch_info="$(command git for-each-ref --format='%(refname:short) %(upstream:short)' $head_ref 2>/dev/null)"
+fi
+if [[ -z $commit_name && -n $head_ref ]]; then
+    local -a ref_parts; ref_parts=("${(s./.)head_ref}")
+    commit_name="<empty>"
+    branch_info="$ref_parts[3]"
+fi
+
+local info_line; info_line="$commit_name $branch_info"
+echo "$info_line"
+
+# vim: ft=zsh sw=4 ts=4 et

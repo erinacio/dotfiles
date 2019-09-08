@@ -1,10 +1,36 @@
 0=${${(%):-%N}:a}
 ZSH_CUSTOM_DIR="${0:h}"
-ZSH_NESTED="$ZSH_NESTED${ZSH_NESTED+ }$$"
-zsh_nested=("${(s. .)ZSH_NESTED}")
 typeset -gxr ZSH_CUSTOM_DIR
-typeset -gxr ZSH_NESTED
-typeset -ar zsh_nested
+
+export ZDOTDIR="${ZDOTDIR:-${HOME}}"
+[[ -f "$ZDOTDIR/.zshenv" ]] || touch "$ZDOTDIR/.zshenv"
+[[ -f "$ZDOTDIR/.zprofile" ]] || touch "$ZDOTDIR/.zprofile"
+[[ -f "$ZDOTDIR/.zlogin" ]] || touch "$ZDOTDIR/.zlogin"
+[[ -f "$ZDOTDIR/.zlogout" ]] || touch "$ZDOTDIR/.zlogout"
+
+# automatically remove duplicates from these arrays
+typeset -U path PATH cdpath CDPATH fpath FPATH manpath MANPATH
+
+# Load a few modules
+for mod in parameter complist deltochar mathfunc ; do
+    zmodload -i zsh/${mod} 2>/dev/null || print "Notice: no ${mod} available :("
+done && builtin unset -v mod
+
+zmodload -a  zsh/stat    zstat
+zmodload -a  zsh/zpty    zpty
+zmodload -ap zsh/mapfile mapfile
+
+# Load functions
+fpath+="$ZSH_CUSTOM_DIR/functions"
+
+autoload -Uz ask_yesno
+autoload -Uz bookmark
+autoload -Uz git-for-each
+autoload -Uz git_clone_if_not_exists
+autoload -Uz git_head_info
+autoload -Uz newtmp
+autoload -Uz sshtmux
+autoload -Uz up
 
 pre_scripts=(
 plugin.completion
@@ -105,6 +131,14 @@ function has_command {
     (( ${+commands[$1]} ))
 }
 
+## SCM helper functions
+function git_repo_root {
+    git rev-parse --show-toplevel 2>/dev/null
+}
+
+function git_is_repo {
+    [[ -n $1 && -f "$1/.git/HEAD" && -d "$1/.git/objects" && -d "$1/.git/refs" ]]
+}
 
 ## ZSH internal envs
 source "${ZDOTDIR:-${HOME}}/.zshenv"
@@ -127,119 +161,6 @@ COMMAND_NOT_FOUND=${COMMAND_NOT_FOUND:-0}
 ZSH_NO_DEFAULT_LOCALE=${ZSH_NO_DEFAULT_LOCALE:-0}
 
 REPORT_TIME=1
-
-fpath+="$ZSH_CUSTOM_DIR/functions"
-
-## Misc helper functions
-function ask_yesno {
-    local default_ret=0
-    while true; do
-        case $1 in
-            -y) default_ret=0; shift 1;;
-            -n) default_ret=1; shift 1;;
-            -h)
-                echo "$0: [-y|-n] prompt"
-                echo "options:"
-                echo "    -y  default to yes"
-                echo "    -n  default to no"
-                return 255;;
-            -*)
-                echo "$0: unknown option $1" >&2
-                return 255;;
-            *) break;;
-        esac
-    done
-    local prompt="${*:-Yes or no?}"
-    local answer
-    if (( $default_ret == 0 )); then
-        read -k 1 "answer?$prompt (Y/n)"
-    else
-        read -k 1 "answer?$prompt (y/N)"
-    fi
-    case ${answer:0:1} in
-        y|Y) return 0;;
-        n|N) return 1;;
-        *)   return $default_ret;;
-    esac
-}
-
-
-## SCM helper functions
-function git_repo_root {
-    git rev-parse --show-toplevel 2>/dev/null
-}
-
-function git_head_info {
-    # result: <commit-name> [<branch-name>] [<remote-branch-name>]
-
-    local commit_name; commit_name="$(command git describe --tags --always 2>/dev/null)"
-    #local commit_name; commit_name="$(git rev-parse --short HEAD 2>/dev/null)"
-    local head_ref; head_ref="$(command git symbolic-ref -q HEAD 2>/dev/null)"
-    local branch_info=''
-    if [[ -n $head_ref ]]; then
-        branch_info="$(command git for-each-ref --format='%(refname:short) %(upstream:short)' $head_ref 2>/dev/null)"
-    fi
-    if [[ -z $commit_name && -n $head_ref ]]; then
-        local -a ref_parts; ref_parts=("${(s./.)head_ref}")
-        commit_name="<empty>"
-        branch_info="$ref_parts[3]"
-    fi
-
-    local info_line; info_line="$commit_name $branch_info"
-    echo "$info_line"
-}
-
-function git_is_repo {
-    [[ -n $1 && -f "$1/.git/HEAD" && -d "$1/.git/objects" && -d "$1/.git/refs" ]]
-}
-
-function git_clone_if_not_exists {
-    local always_yes=0
-    while true; do
-        case $1 in
-            -y) always_yes=1; shift 1;;
-            -0) 0=$2; shift 2;;
-            -h) echo "$0 [-y] [-0 NAME] remote-url local-dir"
-                echo "options:"
-                echo "    -y       clone if not exists without confirm"
-                echo '    -0 NAME  use NAME as $0'
-                return 0;;
-            -*) echo "$0: unknown option $1" >&2; return 255;;
-            *)  break;;
-        esac
-    done
-
-    if (( ${#argv} > 2)); then
-        echo "$1: too many arguments" >&2
-        return 255
-    fi
-
-    local remote_url="$1"
-    local local_dir="$2:a"
-
-    if [[ -z $remote_url ]]; then
-        echo "$0: remote url not specified" >&2
-        return 255
-    fi
-    if [[ -z $local_dir ]]; then
-        echo "$0: local dir not specified" >&2
-        return 255
-    fi
-    if git_is_repo "$local_dir"; then
-        return 0
-    fi
-    if [[ -e $local_dir ]]; then
-        echo "$0: $local_dir already exists but is not a git repo" >&2
-        return 255
-    fi
-    if (( $always_yes )) || ask_yesno "$0: $local_dir is empty, clone from $remote_url?"; then
-        command git clone "$remote_url" "$local_dir"
-        return $?
-    else
-        return 1
-    fi
-}
-
 
 ## Editor
 if [[ -z $EDITOR ]]; then
@@ -312,20 +233,6 @@ if is_darwin || is_freebsd; then
     export CLICOLOR=1
     export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
 fi
-
-## Misc
-# automatically remove duplicates from these arrays
-typeset -U path PATH cdpath CDPATH fpath FPATH manpath MANPATH
-
-# Load a few modules
-for mod in parameter complist deltochar mathfunc ; do
-    zmodload -i zsh/${mod} 2>/dev/null || print "Notice: no ${mod} available :("
-done && builtin unset -v mod
-
-zmodload -a  zsh/stat    zstat
-zmodload -a  zsh/zpty    zpty
-zmodload -ap zsh/mapfile mapfile
-
 
 ## Completion
 COMPDUMPFILE=${COMPDUMPFILE:-${ZDOTDIR:-${HOME}}/.zcompdump}
@@ -499,6 +406,7 @@ bindkey -e
 [[ -n "${key[Left]}"    ]]   && bindkey  "${key[Left]}"     backward-char
 [[ -n "${key[Right]}"   ]]   && bindkey  "${key[Right]}"    forward-char
 [[ -n "${key[ShiftTab]}" ]]  && bindkey  "${key[ShiftTab]}" reverse-menu-complete
+[[ -n "${KONSOLE_VERSION}" ]] && bindkey -M menuselect '^[[Z' reverse-menu-complete # konsole fix
 
 # Finally, make sure the terminal is in application mode, when zle is
 # active. Only then are the values from $terminfo valid.
@@ -584,6 +492,16 @@ function _prompt_tag_proxy {
 }
 prompt_tag_functions+=_prompt_tag_proxy
 
+function _prompt_tag_cc {
+    [[ -n $CC ]] && print -n "%Bcc%b:${CC}"
+}
+prompt_tag_functions+=_prompt_tag_cc
+
+function _prompt_tag_cxx {
+    [[ -n $CXX ]] && print -n "%Bcxx%b:${CXX}"
+}
+prompt_tag_functions+=_prompt_tag_cxx
+
 
 ## Aliases
 alias -g ...='../..'
@@ -593,11 +511,6 @@ alias -g ......='../../../../..'
 alias -g DN=/dev/null
 alias -g NUL="> /dev/null 2>&1"
 alias -g NE="2> /dev/null"
-
-if is_linux && has_command sudo && has_command docker; then
-    alias docker='sudo docker'
-fi
-
 
 ## Other helper functions
 function cdz {
@@ -622,13 +535,6 @@ function cd {
         builtin cd "$@"
     fi
 }
-
-
-autoload -Uz git-for-each
-autoload -Uz newtmp
-autoload -Uz up
-autoload -Uz bookmark
-autoload -Uz sshtmux
 
 
 if (( $no_dynamic )); then

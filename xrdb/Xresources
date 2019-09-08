@@ -33,8 +33,6 @@ URxvt.keysym.M-Escape:perl:keyboard-select:activate
 URxvt.keysym.Control-Shift-V:     perl:pasta:paste
 URxvt.clipboard.autocopy: true
 
-!Xft.dpi:        96
-Xft.dpi:        120
 Xft.antialias:  true
 Xft.rgba:       rgb
 Xft.hinting:    false

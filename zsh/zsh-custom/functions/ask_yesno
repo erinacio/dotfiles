@@ -1,0 +1,30 @@
+local default_ret=0
+while true; do
+    case $1 in
+        -y) default_ret=0; shift 1;;
+        -n) default_ret=1; shift 1;;
+        -h)
+            echo "$0: [-y|-n] prompt"
+            echo "options:"
+            echo "    -y  default to yes"
+            echo "    -n  default to no"
+            return 255;;
+        -*)
+            echo "$0: unknown option $1" >&2
+            return 255;;
+        *) break;;
+    esac
+done
+local prompt="${*:-Yes or no?}"
+local answer
+if (( $default_ret == 0 )); then
+    read -k 1 "answer?$prompt (Y/n)"
+else
+    read -k 1 "answer?$prompt (y/N)"
+fi
+case ${answer:0:1} in
+    y|Y) return 0;;
+    n|N) return 1;;
+    *)   return $default_ret;;
+esac
+# vim: ft=zsh sw=4 ts=4 et

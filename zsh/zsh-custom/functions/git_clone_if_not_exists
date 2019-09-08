@@ -1,0 +1,45 @@
+local always_yes=0
+while true; do
+    case $1 in
+        -y) always_yes=1; shift 1;;
+        -0) 0=$2; shift 2;;
+        -h) echo "$0 [-y] [-0 NAME] remote-url local-dir"
+            echo "options:"
+            echo "    -y       clone if not exists without confirm"
+            echo '    -0 NAME  use NAME as $0'
+            return 0;;
+        -*) echo "$0: unknown option $1" >&2; return 255;;
+        *)  break;;
+    esac
+done
+
+if (( ${#argv} > 2)); then
+    echo "$1: too many arguments" >&2
+    return 255
+fi
+
+local remote_url="$1"
+local local_dir="$2:a"
+
+if [[ -z $remote_url ]]; then
+    echo "$0: remote url not specified" >&2
+    return 255
+fi
+if [[ -z $local_dir ]]; then
+    echo "$0: local dir not specified" >&2
+    return 255
+fi
+if git_is_repo "$local_dir"; then
+    return 0
+fi
+if [[ -e $local_dir ]]; then
+    echo "$0: $local_dir already exists but is not a git repo" >&2
+    return 255
+fi
+if (( $always_yes )) || ask_yesno "$0: $local_dir is empty, clone from $remote_url?"; then
+    command git clone "$remote_url" "$local_dir"
+    return $?
+else
+    return 1
+fi
+# vim: ft=zsh sw=4 ts=4 et
