@@ -1,0 +1,123 @@
+local -r url_repo_regex='^([A-Za-z]([-+.0-9A-Za-z])*)://([^@]*@)?([^:/?#]+)(:\d+)?(/[^?#]*)?(\?[^#]*)?(#.*)?$'
+local -r scp_repo_regex='^([^@]+@)?([^:]+):(.*)$'
+local -r sane_path_regex='^[-_.0-9A-Za-z]+(/[-_.0-9A-Za-z]+)*$'
+read -r -d '' usage <<EOF
+Usage: $0 <command> [REPO]
+
+Commands:
+    cd      Enter directory of that repository.
+    get     Clone or fetch remote repository.
+    help    Display this message.
+    rehash  Refresh completion cache.
+    root    Get root directory of repository, or location of src directory if no REPO.
+    up      Update that repository, or pull all repositories if REPO is omitted.
+EOF
+SCMPATH="${SCMPATH:-$HOME/src}"
+[[ -d $SCMPATH ]] || mkdir -p -m 700 "$SCMPATH" 2>/dev/null
+local cmd="$1"
+if [[ -z $cmd ]]; then
+    echo "Command not specified.\n$usage" >&2
+    return 255
+fi
+if [[ ${#@} -gt 2 ]]; then
+    echo "Too many arguments.\n$usage" >&2
+    return 255
+fi
+local repo_path=''
+local repo_url=''
+if [[ -n $2 ]]; then
+    if [[ $2 =~ $url_repo_regex ]]; then
+        repo_path="${match[4]}${match[6]}"
+        repo_url="$2"
+    elif [[ $2 =~ $scp_repo_regex ]]; then
+        repo_path="${match[2]}/${match[3]}"
+        repo_url="$2"
+    elif [[ $2 =~ '^[^/].*$' ]]; then
+        repo_path="$2"
+        repo_url="https://$2"
+    else
+        echo "Invalid repo syntax: ${(q)2}" >&2
+        return 255
+    fi
+    if [[ $repo_path = */ ]]; then
+        repo_path="${repo_path[1,-2]}"
+    fi
+    if [[ $repo_path = *.git ]]; then
+        repo_path="${repo_path[1,-5]}"
+    fi
+    if ! [[ $repo_path =~ $sane_path_regex ]]; then
+        echo "Repo path didn't pass sanity check: ${(q)repo_path}" >&2
+        return 255
+    fi
+fi
+case $cmd in
+    cd)
+        if [[ -z $repo_path ]]; then
+            echo "REPO is required for ${(q)cmd}" >&2
+            return 255
+        fi
+        local dir_path="$SCMPATH/$repo_path"
+        builtin cd "${dir_path:A}"
+        return $?
+        ;;
+    get)
+        if [[ -z $repo_path ]]; then
+            echo "REPO is required for ${(q)cmd}" >&2
+            return 255
+        fi
+        local dir_path="$SCMPATH/$repo_path"
+        if [[ -d "$dir_path" && -d "$dir_path/.git" ]]; then
+            ( set -x; builtin cd "${dir_path:A}" && command git fetch --all --recurse-submodules )
+            return $?
+        else
+            ( set -x; mkdir -p "${repo_path:h}" && command git clone --recursive "$repo_url" "$repo_path" )
+            local ret=$?
+            scm rehash
+            return $ret
+        fi
+        ;;
+    help)
+        echo "$usage" >&2
+        return 0
+        ;;
+    rehash)
+        local -aU comp_dirs
+        (
+            set -e
+            builtin cd "$SCMPATH"
+            comp_dirs=( **/.git(/) )
+            comp_dirs=( ${comp_dirs:h} )
+            print -l "${comp_dirs[@]}" > .scm_comp_cache
+        )
+        ;;
+    root)
+        if [[ -z $2 ]]; then
+            echo "${SCMPATH:A}"
+        else
+            local dir_path="$SCMPATH/$repo_path"
+            echo "${dir_path:A}"
+        fi
+        ;;
+    up)
+        if [[ -z $2 ]]; then
+            local dir_path=''
+            local ret=0
+            for dir_path in "$SCMPATH"/**/.git; do
+                ( set -x; builtin cd "${dir_path:h}" && command git fetch --all --recurse-submodules )
+                if (( $? != 0 )); then
+                    ret=1
+                fi
+            done
+            return $ret
+        else
+            local dir_path="$SCMPATH/$repo_path"
+            ( set -x; builtin cd "${dir_path:A}" && command git fetch --all --recurse-submodules )
+            return $?
+        fi
+        ;;
+    *)
+        echo "Unknown command ${(q)cmd}\n$usage" >&2
+        return 255;
+        ;;
+esac
+# vim: ft=zsh sw=4 ts=4 et

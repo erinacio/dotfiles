@@ -1,0 +1,32 @@
+#compdef scm
+
+local -r scm_root="$(scm root)"
+
+_arguments \
+    '1: :->cmd' \
+    '2: :->repo'
+
+case $state in
+    cmd)
+        local commands; commands=(
+            'cd:Enter directory of repository'
+            'get:Clone or fetch remote repository'
+            'help:Display help message'
+            'rehash:Refresh completion cache'
+            'root:Get root directory'
+            'up:Update repository'
+        )
+        _describe -t commands 'command' commands
+        ;;
+    repo)
+        local cache_path="$scm_root/.scm_comp_cache"
+        if ! [[ -f $cache_path ]]; then
+            scm rehash
+        fi
+        local -aU lines
+        lines=( "${(f)mapfile[$cache_path]}" )
+        compadd -- "${lines[@]}"
+        ;;
+esac
+
+# vim: ft=zsh sw=4 ts=4 et

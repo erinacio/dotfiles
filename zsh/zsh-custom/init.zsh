@@ -29,6 +29,7 @@ autoload -Uz git-for-each
 autoload -Uz git_clone_if_not_exists
 autoload -Uz git_head_info
 autoload -Uz newtmp
+autoload -Uz scm
 autoload -Uz sshtmux
 autoload -Uz up
 
