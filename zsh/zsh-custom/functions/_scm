@@ -12,6 +12,7 @@ case $state in
             'cd:Enter directory of repository'
             'get:Clone or fetch remote repository'
             'help:Display help message'
+            'list:List all local repositories'
             'rehash:Refresh completion cache'
             'root:Get root directory'
             'up:Update repository'

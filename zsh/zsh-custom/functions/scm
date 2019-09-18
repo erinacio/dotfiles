@@ -8,6 +8,7 @@ Commands:
     cd      Enter directory of that repository.
     get     Clone or fetch remote repository.
     help    Display this message.
+    list    List all local repositories.
     rehash  Refresh completion cache.
     root    Get root directory of repository, or location of src directory if no REPO.
     up      Update that repository, or pull all repositories if REPO is omitted.
@@ -80,14 +81,18 @@ case $cmd in
         echo "$usage" >&2
         return 0
         ;;
-    rehash)
+    rehash|list)
         local -aU comp_dirs
         (
             set -e
             builtin cd "$SCMPATH"
             comp_dirs=( **/.git(/) )
             comp_dirs=( ${comp_dirs:h} )
-            print -l "${comp_dirs[@]}" > .scm_comp_cache
+            if [[ $cmd = list ]]; then
+                print -l "${comp_dirs[@]}" | command tee .scm_comp_cache
+            else
+                print -l "${comp_dirs[@]}" > .scm_comp_cache
+            fi
         )
         ;;
     root)
