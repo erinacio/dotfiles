@@ -70,7 +70,7 @@ case $cmd in
             ( set -x; builtin cd "${dir_path:A}" && command git fetch --all --recurse-submodules )
             return $?
         else
-            ( set -x; mkdir -p "${repo_path:h}" && command git clone --recursive "$repo_url" "$repo_path" )
+            ( set -x; command git clone --recursive "$repo_url" "$dir_path" )
             local ret=$?
             scm rehash
             return $ret
