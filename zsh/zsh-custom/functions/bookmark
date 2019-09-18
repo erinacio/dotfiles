@@ -1,5 +1,5 @@
 # https://zhuanlan.zhihu.com/p/57659856
-MARKPATH="${MARKPATH:-$HOME/.local/share/marks}"
+MARKPATH="${MARKPATH:-$HOME/.zsh/marks}"
 [ -d "$MARKPATH" ] || mkdir -p -m 700 "$MARKPATH" 2> /dev/null
 case "$1" in
     +*)            # bookmark +foo  - add new bookmark for $PWD
