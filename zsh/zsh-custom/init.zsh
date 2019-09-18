@@ -407,6 +407,8 @@ bindkey -e
 [[ -n "${key[Right]}"   ]]   && bindkey  "${key[Right]}"    forward-char
 [[ -n "${key[ShiftTab]}" ]]  && bindkey  "${key[ShiftTab]}" reverse-menu-complete
 [[ -n "${KONSOLE_VERSION}" ]] && bindkey -M menuselect '^[[Z' reverse-menu-complete # konsole fix
+bindkey "^[[1;5C" forward-word  # ctrl-left
+bindkey "^[[1;5D" backward-word  # ctrl-right
 
 # Finally, make sure the terminal is in application mode, when zle is
 # active. Only then are the values from $terminfo valid.
