@@ -36,6 +36,10 @@ set colorcolumn=120,150
 
 set foldmethod=marker
 
+set listchars=eol:$,tab:-->,space:.
+highlight SpecialKey ctermfg=237 guifg=#3a3a3a
+set list
+
 highlight Pmenu ctermbg=darkgray ctermfg=white
 highlight PmenuSel ctermbg=grey ctermfg=black
 highlight ColorColumn ctermbg=grey
@@ -68,6 +72,7 @@ nmap <F4> :qall<CR>
 nmap <F5> :call ExecuteCurrentFile()<CR>
 nmap <F6> :shell<CR>
 nmap <F7> :make<CR>
+nmap <F12> :call ToggleOptionList()<CR>
 
 nmap ,s :%s/\s\+$<CR>
 nmap ,f gg=G
@@ -95,6 +100,14 @@ function ExecuteCurrentFile()
     end
 endfunction
 
+function ToggleOptionList()
+    if &list == '1'
+        set nolist
+    else
+        set list
+    end
+endfunction
+
 function PrintCustomCommonKeyBindings()
     echo '==== VIM Custom Common Key Bindings ==='
     echo '<F2>           toggle nerd tree'
@@ -102,6 +115,7 @@ function PrintCustomCommonKeyBindings()
     echo '<F4>           quit all'
     echo '<F5>           execute'
     echo '<F6>           shell'
+    echo '<F12>          toggle list/nolist'
     echo '<C-left/right> change tab'
     echo '<S-left/right> move tab'
     echo '<C-up/down>    change buffer'
@@ -116,9 +130,16 @@ function Indent2()
     set tabstop=2
 endfunction
 
+function IndentTab4()
+    set noexpandtab
+    set tabstop=4
+    set shiftwidth=4
+endfunction
+
 autocmd FileType html call Indent2()
 autocmd FileType json call Indent2()
 autocmd FileType javascript call Indent2()
 autocmd FileType xml call Indent2()
 autocmd FileType css call Indent2()
 autocmd FileType yaml call Indent2()
+autocmd FileType go call IndentTab4()
