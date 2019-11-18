@@ -36,12 +36,16 @@ set colorcolumn=120,150
 
 set foldmethod=marker
 
-set listchars=eol:$,tab:>-,space:.
-highlight SpecialKey ctermfg=237 guifg=#3a3a3a
+if v:version < 800
+    set listchars=eol:$,tab:>-,trail:.
+else
+    set listchars=eol:$,tab:>-,space:.
+end
 
 highlight Pmenu ctermbg=darkgray ctermfg=white
 highlight PmenuSel ctermbg=grey ctermfg=black
 highlight ColorColumn ctermbg=grey
+highlight SpecialKey ctermfg=blue guifg=blue
 
 command W w !sudo tee % > /dev/null
 
