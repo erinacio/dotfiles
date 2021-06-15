@@ -1,8 +1,20 @@
-if [[ ${#argv} -gt 2 || ${#argv} -le 0 ]]; then
-    echo "$1 <ssh-host> [<tmux-session>]"
+if [[ ${#argv} -le 0 ]]; then
+    echo "$1 <ssh-host> [<ssh-options>] [<tmux-session>]"
     return 1
 fi
 
-ssh -t "$1" "LANG=$LANG" exec tmux new-session -A -s ${2:-main}
+declare -a options
+
+if [[ ${#argv} -gt 1 ]]; then
+    for i in {2..${#argv}}; do
+        options+=$1
+        shift 1
+    done
+else
+    options+=$1
+    shift 1
+fi
+
+ssh -t "${options[@]}" "LANG=$LANG" exec tmux new-session -A -s ${1:-main}
 
 # vim: ft=zsh sw=4 ts=4 et
