@@ -38,11 +38,11 @@ colorscheme onedark
 
 set mouse=a
 set t_Co=256
-if has("gui_macvim")
-    set clipboard=unnamed
-else
-    set clipboard=unnamedplus
-endif
+" if has("gui_macvim")
+"     set clipboard=unnamed
+" else
+"     set clipboard=unnamedplus
+" endif
 
 set colorcolumn=120,150
 
@@ -60,85 +60,6 @@ highlight ColorColumn ctermbg=grey
 highlight SpecialKey ctermfg=blue guifg=blue
 
 command W w !sudo tee % > /dev/null
-
-nmap <TAB> :bnext<CR>
-nmap <S-TAB> :bprev<CR>
-
-nmap <C-Down> :bnext<CR>
-nmap <C-Up> :bprev<CR>
-nmap <C-Left> gT
-nmap <C-Right> gt
-nmap <S-Left> :tabm -<CR>
-nmap <S-Right> :tabm +<CR>
-imap <C-Down> <ESC>:bnext<CR>a
-imap <C-Up> <ESC>:bprev<CR>a
-imap <C-Left> <ESC>gTa
-imap <C-Right> <ESC>gta
-imap <S-Left> <ESC>:tabm -<CR>a
-imap <S-Right> <ESC>:tabm +<CR>a
-
-nmap <C-S> <ESC>:w<CR>
-imap <C-S> <ESC>:w<CR>a
-imap <C-V> <ESC>pa
-
-nmap <F2> :NERDTreeTabsToggle<CR>
-nmap <F3> :wall<CR>:mksession!<CR>:qall<CR>
-nmap <F4> :qall<CR>
-nmap <F5> :call ExecuteCurrentFile()<CR>
-nmap <F6> :shell<CR>
-nmap <F7> :make<CR>
-nmap <F12> :call ToggleOptionList()<CR>
-
-nmap ,s :%s/\s\+$<CR>
-nmap ,f gg=G
-
-function ExecuteCurrentFile()
-    write
-    if &filetype == 'c'
-        ! gcc -std=gnu11 % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
-    elseif &filetype == 'cpp'
-        ! g++ -std=gnu++14 % -o /tmp/a.out && /tmp/a.out; rm /tmp/a.out
-    elseif &filetype == 'go'
-        ! go run %
-    elseif getline(1) =~# '^#!/.*$'
-        exe "!" . strpart(getline(1), 2) . " " . shellescape(expand("%"))
-    elseif &filetype == 'python'
-        ! python %
-    elseif &filetype == 'perl'
-        ! perl %
-    elseif &filetype == 'sh'
-        ! bash %
-    elseif &filetype == 'javascript'
-        ! node %
-    elseif &filetype == 'groovy'
-        ! groovy %
-    end
-endfunction
-
-function ToggleOptionList()
-    if &list == '1'
-        set nolist
-    else
-        set list
-    end
-endfunction
-
-function PrintCustomCommonKeyBindings()
-    echo '==== VIM Custom Common Key Bindings ==='
-    echo '<F2>           toggle nerd tree'
-    echo '<F3>           quick quit and preserve session'
-    echo '<F4>           quit all'
-    echo '<F5>           execute'
-    echo '<F6>           shell'
-    echo '<F12>          toggle list/nolist'
-    echo '<C-left/right> change tab'
-    echo '<S-left/right> move tab'
-    echo '<C-up/down>    change buffer'
-    echo ',s             remove trailing spaces'
-    echo ',f             format all lines'
-endfunction
-
-nmap ,h :call PrintCustomCommonKeyBindings()<CR>
 
 function Indent2()
     set shiftwidth=2
